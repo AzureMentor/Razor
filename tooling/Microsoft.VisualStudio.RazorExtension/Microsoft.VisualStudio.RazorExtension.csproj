@@ -8,7 +8,7 @@
     <VSIXBuildNumber Condition="'$(VSIXBuildNumber)' == ''">$(BuildNumber)</VSIXBuildNumber>
     <VsixVersion Condition="'$(VSIXBuildNumber)'!=''">$(VsixVersion).$(VSIXBuildNumber)</VsixVersion>
     <VsixVersion Condition="'$(VSIXBuildNumber)'==''">$(VsixVersion).999999</VsixVersion>
-    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <MinimumVisualStudioVersion>16.0</MinimumVisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -27,6 +27,11 @@
     <IsProductComponent>true</IsProductComponent>
     <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
     <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>15.0</OldToolsVersion>
   </PropertyGroup>
   <Import Project="..\..\version.props" />
   <Import Project="..\..\build\sources.props" />
@@ -297,6 +302,8 @@
       <IncludeInVsix>true</IncludeInVsix>
       <InstallRoot>MSBuild</InstallRoot>
       <VSIXSubPath>Microsoft\VisualStudio\Razor\Rules\</VSIXSubPath>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <!--
