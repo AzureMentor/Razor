@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.Editor.Razor
 
             // Act
             var completionContext = await Task.Run(
-                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, CancellationToken.None));
+                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, null, CancellationToken.None));
 
             // Assert
             Assert.Empty(completionContext.Items);
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.Editor.Razor
 
             // Act
             var completionContext = await Task.Run(
-                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, CancellationToken.None));
+                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, null, CancellationToken.None));
 
             // Assert
             Assert.Empty(completionContext.Items);
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.Editor.Razor
 
             // Act
             var completionContext = await Task.Run(
-                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, CancellationToken.None));
+                async () => await completionSource.GetCompletionContextAsync(new InitialTrigger(), triggerLocation, applicableSpan, null, CancellationToken.None));
 
             // Assert
             Assert.Collection(
