@@ -59,10 +59,10 @@ namespace Microsoft.VisualStudio.Editor.Razor
         }
 
         public Task<CompletionContext> GetCompletionContextAsync(
-            InitialTrigger trigger,
+            IAsyncCompletionSession session,
+            CompletionTrigger trigger,
             SnapshotPoint triggerLocation,
             SnapshotSpan applicableSpan,
-            IAsyncCompletionSession session,
             CancellationToken token)
         {
             _foregroundDispatcher.AssertBackgroundThread();
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.Editor.Razor
             return Task.FromResult(context);
         }
 
-        public Task<object> GetDescriptionAsync(CompletionItem item, CancellationToken token)
+        public Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
         {
             if (!item.Properties.TryGetProperty<string>(DescriptionKey, out var directiveDescription))
             {
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.Editor.Razor
             return Task.FromResult<object>(directiveDescription);
         }
 
-        public CompletionStartData InitializeCompletion(InitialTrigger trigger, SnapshotPoint triggerLocation, ITextSnapshot snapshotBeforeEdit, CancellationToken token)
+        public CompletionStartData InitializeCompletion(CompletionTrigger trigger, SnapshotPoint triggerLocation, CancellationToken token)
         {
             // The applicable span for completion is the piece of text a completion is for. For example:
             //      @Date|Time.Now
