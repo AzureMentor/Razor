@@ -8,12 +8,12 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.Language;
-using Microsoft.CodeAnalysis.Experiment;
+using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
 {
-    internal class GeneratedCodeContainer : IDocumentServiceFactory, ISpanMapper
+    internal class GeneratedCodeContainer : IDocumentServiceProvider, ISpanMappingService
     {
         public event EventHandler<TextChangeEventArgs> GeneratedCodeChanged;
 
@@ -86,7 +86,7 @@ namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
             }
         }
 
-        public TService GetService<TService>()
+        public TService GetService<TService>() where TService : IDocumentService
         {
             if (this is TService service)
             {
@@ -126,7 +126,7 @@ namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
             }
         }
 
-        public Task<ImmutableArray<SpanMapResult>> MapSpansAsync(
+        public Task<ImmutableArray<MappedSpanResult>> MapSpansAsync(
             Document document,
             IEnumerable<TextSpan> spans,
             CancellationToken cancellationToken)
@@ -137,19 +137,19 @@ namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
             {
                 if (Output == null)
                 {
-                    return Task.FromResult(ImmutableArray<SpanMapResult>.Empty);
+                    return Task.FromResult(ImmutableArray<MappedSpanResult>.Empty);
                 }
 
                 output = Output;
                 source = Source;
             }
 
-            var results = ImmutableArray.CreateBuilder<SpanMapResult>();
+            var results = ImmutableArray.CreateBuilder<MappedSpanResult>();
             foreach (var span in spans)
             {
                 if (TryGetLinePositionSpan(span, source, output, out var linePositionSpan))
                 {
-                    results.Add(new SpanMapResult(document, linePositionSpan));
+                    results.Add(new MappedSpanResult(document.FilePath, linePositionSpan, span));
                 }
             }
 

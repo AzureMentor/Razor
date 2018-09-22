@@ -302,7 +302,13 @@ namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
             }
 
             projectManager.DocumentAdded(_current, document, new FileTextLoader(document.FilePath, null));
-            _projectContext?.AddSourceFile(document.FilePath, document.GeneratedCodeContainer.SourceTextContainer, true, GetFolders(document), SourceCodeKind.Regular, document.GeneratedCodeContainer);
+            _projectContext?.AddSourceTextContainer(
+                textContainer: document.GeneratedCodeContainer.SourceTextContainer,
+                fullPath: document.FilePath,
+                folderNames: GetFolders(document),
+                SourceCodeKind.Regular,
+                isOpen: true,
+                documentServiceProvider: document.GeneratedCodeContainer);
             _currentDocuments.Add(document.FilePath, document);
         }
 

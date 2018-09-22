@@ -21,6 +21,8 @@ using Item = System.Collections.Generic.KeyValuePair<string, System.Collections.
 
 #if WORKSPACE_PROJECT_CONTEXT_FACTORY
 using IWorkspaceProjectContextFactory = Microsoft.VisualStudio.LanguageServices.ProjectSystem.IWorkspaceProjectContextFactory2;
+#else
+using Microsoft.VisualStudio.LanguageServices.ProjectSystem;
 #endif
 
 namespace Microsoft.CodeAnalysis.Razor.ProjectSystem
