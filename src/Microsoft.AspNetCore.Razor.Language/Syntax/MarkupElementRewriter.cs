@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Microsoft.AspNetCore.Razor.Language.Syntax
 {
-    internal class MarkupElementRewriter
+    internal static class MarkupElementRewriter
     {
         public static RazorSyntaxTree Rewrite(RazorSyntaxTree syntaxTree)
         {
@@ -52,12 +52,7 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                 "wbr"
             };
 
-            private readonly Stack<TagBlockTracker> _startTagTracker;
-
-            public Rewriter()
-            {
-                _startTagTracker = new Stack<TagBlockTracker>();
-            }
+            private readonly Stack<TagBlockTracker> _startTagTracker = new Stack<TagBlockTracker>();
 
             private TagBlockTracker CurrentTracker => _startTagTracker.Count > 0 ? _startTagTracker.Peek() : null;
 
@@ -111,8 +106,7 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                     }
                     else if (IsEndTag(tagBlock))
                     {
-                        if (!string.IsNullOrEmpty(CurrentStartTagName) &&
-                            string.Equals(CurrentStartTagName, tagName, StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(CurrentStartTagName, tagName, StringComparison.OrdinalIgnoreCase))
                         {
                             var startTagTracker = _startTagTracker.Pop();
                             var startTagIndex = startTagTracker.Index;
@@ -179,9 +173,6 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                 IEnumerable<RazorSyntaxNode> tagChildren,
                 MarkupTagBlockSyntax endTag)
             {
-                var body = new SyntaxList<RazorSyntaxNode>(tagChildren);
-                var markupElement = SyntaxFactory.MarkupElement((MarkupTagBlockSyntax)startTag, body, endTag);
-
                 // Build a list of the original nodes that we want to replace with the rewritten element.
                 var originalNodes = new List<SyntaxNode>();
                 if (startTag != null)
@@ -201,10 +192,13 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                 }
 
                 // Replace nodes
-                var rewrittenElement = parent.ReplaceNodes(originalNodes, (original, rewritten) => {
+                var rewrittenElement = parent.ReplaceNodes(originalNodes, (original, rewritten) =>
+                {
                     if (original == originalNodes[0] || rewritten == originalNodes[0])
                     {
                         // Put the new element in place of the first original node to be replaced.
+                        var body = new SyntaxList<RazorSyntaxNode>(tagChildren);
+                        var markupElement = SyntaxFactory.MarkupElement((MarkupTagBlockSyntax)startTag, body, endTag);
                         return markupElement;
                     }
 
@@ -236,7 +230,7 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                     malformedTagCount++;
                 }
 
-                if (malformedTagCount != _startTagTracker.Count)
+                if (_startTagTracker.Count > malformedTagCount)
                 {
                     parent = RewriteMalformedTags(parent, malformedTagCount);
 
@@ -287,7 +281,7 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
 
             private bool IsVoidElement(MarkupTagBlockSyntax tagBlock)
             {
-                return VoidElements.Contains(tagBlock.GetTagName(), StringComparer.OrdinalIgnoreCase);
+                return VoidElements.Contains(tagBlock.GetTagName());
             }
 
             private bool IsSelfClosing(MarkupTagBlockSyntax tagBlock)
@@ -336,14 +330,12 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
                     return node;
                 }
 
-                var currentIndex = 0;
                 var children = node.ChildNodes();
-                while (currentIndex < children.Count)
+                for (var i = 0; i < children.Count; i++)
                 {
-                    var child = children[currentIndex];
+                    var child = children[i];
                     if (!(child is MarkupElementSyntax tagElement))
                     {
-                        currentIndex++;
                         continue;
                     }
 
@@ -351,8 +343,6 @@ namespace Microsoft.AspNetCore.Razor.Language.Syntax
 
                     // Since we rewrote 'node', it's children are different. Update our collection.
                     children = node.ChildNodes();
-
-                    currentIndex++;
                 }
 
                 return node;
